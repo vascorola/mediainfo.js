@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # download sources
-wget https://mediaarea.net/download/source/libmediainfo/0.7.82/libmediainfo_0.7.82.tar.bz2 -q -O - | tar -xj
-wget https://mediaarea.net/download/source/libzen/0.4.32/libzen_0.4.32.tar.bz2 -q -O - | tar -xj
+wget https://mediaarea.net/download/source/libmediainfo/0.7.94/libmediainfo_0.7.94.tar.bz2 -q -O - | tar -xj
+wget https://mediaarea.net/download/source/libzen/0.4.35/libzen_0.4.35.tar.bz2 -q -O - | tar -xj
 mkdir -p Shared/Source
-wget http://zlib.net/zlib-1.2.8.tar.gz -q -O - | tar -xz -C Shared/Source
-mv Shared/Source/zlib-1.2.8 Shared/Source/zlib
+wget http://zlib.net/zlib-1.2.11.tar.gz -q -O - | tar -xz -C Shared/Source
+mv Shared/Source/zlib-1.2.11 Shared/Source/zlib
 
 # zlib
 cd Shared/Source/zlib
