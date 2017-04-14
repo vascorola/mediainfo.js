@@ -4,8 +4,6 @@
 ThumbsDB
 \#*#
 .#*
-ZenLib
-MediaInfoLib
-Shared
+/lib/
 mediainfojs.o
 npm-debug.log

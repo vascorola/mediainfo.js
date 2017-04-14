@@ -16,7 +16,7 @@ can be found in `$PATH`. Something like this will do:
 
 First you must build the dependencies:
 
-    ./build-deps.sh
+    ./npm run build-dist
 
 Then build `mediainfo.js` using:
 

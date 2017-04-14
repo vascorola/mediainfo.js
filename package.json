@@ -4,6 +4,11 @@
   "description": "Emscripten port of MediaInfoLib displays information about video and audio files.",
   "author": "buzz",
   "main": "mediainfo.js",
+  "scripts": {
+      "build-deps": "scripts/build-deps.sh",
+      "build-src": "scripts/build-src.sh",
+      "build-dist": "npm run build-deps && npm run build-src"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/buzz/mediainfo.js"
