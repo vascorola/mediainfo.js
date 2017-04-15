@@ -4,7 +4,11 @@ var fs = require('fs');
 var MediaInfoJs = require('mediainfo.js');
 
 
-var BUF_SIZE = 7 * 188;
+//var BUF_SIZE = 7 * 188;
+var BUF_SIZE = 28 * 188;
+// var BUF_SIZE = 1024; // 1 KiB, 6.62sec
+// var BUF_SIZE = 1 * 1024;
+//var BUF_SIZE = 512 * 1024; // 512 KiB
 
 function parseFile(filename, fileSize) {
     return new Promise((resolve, reject) => {
@@ -14,40 +18,57 @@ function parseFile(filename, fileSize) {
                 return;
             }
             var buffer = new Buffer(BUF_SIZE, 'binary');
-            var mi = new MediaInfo();
-            mi.open_buffer_init(fileSize, 0);
-            var totalRead = 0, filePos = 0;
+            var mi = new MediaInfo(), seekPos = -1;
+            var total = 0, every = 0;
 
-            function readChunk() {
-                fs.read(fd, buffer, 0, BUF_SIZE, filePos, function(err, bytesRead) {
-                    if (err) {
-                        reject(err.message);
-                        return;
-                    }
-                    totalRead += bytesRead;
-                    console.log("Read %d bytes.", totalRead);
+            function _resolve() {
+                mi.open_buffer_finalize();
+                var result = mi.inform();
+                resolve(result);
+            }
+
+            function process(err, bytesRead) {
+                if (err) {
+                    reject(err.message);
+                    return;
+                }
+                if (bytesRead > 0) {
                     //Sending the buffer to MediaInfo
-                    var state = mi.open_buffer_continue(buffer, bytesRead);
+                    var state = mi.open_buffer_continue(
+                        bytesRead === BUF_SIZE ? buffer : buffer.slice(0, bytesRead),
+                        bytesRead
+                    );
+//                    if (state & 0x02 || state & 0x08) { // Bit 3 => Finished
+                    if (++every > 50000) {
+                        console.log('bytes read: %d', total);
+                        every = 0;
+                    }
+                    total += bytesRead;
                     if (state & 0x08) { // Bit 3 => Finished
-                        console.log('state => FINISHED');
-                        console.log("Read %d bytes.", totalRead);
-                        var result = mi.inform();
-                        resolve(result)
+                        _resolve();
                         return;
                     }
                     //Testing if there is a MediaInfo request to go elsewhere
-                    var seekPos = mi.open_buffer_continue_goto_get();
-                    if (seekPos !== -1) {
-                        filePos = seekPos;
-                        console.log('SEEKING: %d', filePos);
-                        mi.open_buffer_init(fileSize, filePos); // Informing MediaInfo we have seek
+                    var oldSeekPos = seekPos;
+                    seekPos = mi.open_buffer_continue_goto_get();
+                    if (oldSeekPos !== seekPos && seekPos !== -1) {
+                        // inform MediaInfo we have seek
+                        console.log('SEEK', seekPos);
+                        mi.open_buffer_init(fileSize, seekPos);
+                        fs.read(fd, buffer, 0, BUF_SIZE, seekPos, process);
                     }
-                    if (bytesRead > 0)
-                        readChunk();
-                });
+                    else {
+                        fs.read(fd, buffer, 0, BUF_SIZE, null, process);
+                    }
+                }
+                else {
+                    // EOF encountered
+                    _resolve();
+                    return;
+                }
             }
-
-            readChunk();
+            mi.open_buffer_init(fileSize, 0);
+            fs.read(fd, buffer, 0, BUF_SIZE, null, process);
         });
     })
 }
