@@ -14,15 +14,11 @@ can be found in `$PATH`. Something like this will do:
 
     source ~/programs/emsdk_portable/emsdk_env.sh
 
-First you must build the dependencies:
+Build using:
 
-    ./npm run build-dist
+    npm run build-dist
 
-Then build `mediainfo.js` using:
-
-    ./build.sh
-
-The resulting files are `mediainfo.js` and `mediainfo.js.mem`.
+The resulting files are `dist/mediainfo.js` and `dist/mediainfo.js.mem`.
 
 ## Using mediainfo.js
 

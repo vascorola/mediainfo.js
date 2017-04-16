@@ -8,6 +8,7 @@ public:
   MediaInfoJs() {
     mi.Option(__T("Output"), __T("XML"));
     mi.Option(__T("File_IsSeekable"), __T("1"));
+    mi.Option(__T("ParseSpeed"), __T("0"));
   }
   int open(const std::string& data, double fileSize) {
     return mi.Open((const ZenLib::int8u*)data.data(), data.size(), NULL, 0, (ZenLib::int64u)fileSize);
@@ -20,6 +21,9 @@ public:
   }
   long open_buffer_continue_goto_get(){
     return (int64_t)mi.Open_Buffer_Continue_GoTo_Get();
+  }
+  long open_buffer_finalize(){
+    return (int64_t)mi.Open_Buffer_Finalize();
   }
   MediaInfoLib::String inform() {
     return mi.Inform();
@@ -36,6 +40,7 @@ EMSCRIPTEN_BINDINGS(mediainfojs) {
     .function("open_buffer_init", &MediaInfoJs::open_buffer_init)
     .function("open_buffer_continue", &MediaInfoJs::open_buffer_continue)
     .function("open_buffer_continue_goto_get", &MediaInfoJs::open_buffer_continue_goto_get)
+    .function("open_buffer_finalize", &MediaInfoJs::open_buffer_finalize)
     .function("inform", &MediaInfoJs::inform)
     .function("close", &MediaInfoJs::close)
     ;

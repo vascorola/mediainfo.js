@@ -1,13 +1,12 @@
-return function(opts) {
-    var options;
-    if (typeof(opts) === 'function') {
-        options = {};
-        options.onRuntimeInitialized = opts;
+return function(arg) {
+    var options = {};
+    if (typeof(arg) === 'function') {
+        options.onRuntimeInitialized = arg;
     }
     else {
-        options = opts || {};
+        options = arg || options;
     }
-    options.memoryInitializerPrefixURL = options.hasOwnProperty('memoryInitializerPrefixURL') ? options.memoryInitializerPrefixURL : './';
-  return Module(opts);
+    var M = Module(options);
+    return M.MediaInfo;
 };
 }));
